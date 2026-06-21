@@ -23,6 +23,7 @@ export default function AsistenciaPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [attendance, setAttendance] = useState<AttendanceMap>({});
   const [date, setDate] = useState(todayISO());
+  const [mes, setMes] = useState(() => todayISO().slice(0, 7)); // "YYYY-MM"
 
   // Cargar estudiantes y asistencia guardada (solo en cliente)
   useEffect(() => {
@@ -72,6 +73,44 @@ export default function AsistenciaPage() {
   // % sobre el total de estudiantes
   const porcentaje =
     students.length > 0 ? Math.round((presentes / students.length) * 100) : 0;
+
+  // ---- Resumen mensual (totalizado por estudiante) ----
+  const monthlyStats = students.map((student) => {
+    let pres = 0;
+    let aus = 0;
+    Object.entries(attendance).forEach(([dia, registro]) => {
+      if (dia.startsWith(mes)) {
+        const st = registro[student.id];
+        if (st === 'Presente') pres++;
+        else if (st === 'Ausente') aus++;
+      }
+    });
+    const total = pres + aus;
+    const pct = total > 0 ? Math.round((pres / total) * 100) : 0;
+    return { student, pres, aus, total, pct };
+  });
+
+  // Sesiones (días distintos con algún registro) en el mes
+  const sesionesDelMes = Object.keys(attendance).filter((d) =>
+    d.startsWith(mes)
+  ).length;
+
+  const totalPres = monthlyStats.reduce((s, m) => s + m.pres, 0);
+  const totalMarcas = monthlyStats.reduce((s, m) => s + m.total, 0);
+  const pctMes =
+    totalMarcas > 0 ? Math.round((totalPres / totalMarcas) * 100) : 0;
+
+  const nombreMes = (() => {
+    const [y, m] = mes.split('-').map(Number);
+    return new Date(y, m - 1).toLocaleDateString('es-CO', {
+      month: 'long',
+      year: 'numeric',
+    });
+  })();
+
+  function barColor(pct: number) {
+    return pct >= 80 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-400' : 'bg-red-500';
+  }
 
   return (
     <div className="min-h-screen bg-zinc-100 flex">
@@ -234,6 +273,99 @@ export default function AsistenciaPage() {
             </table>
           </div>
         )}
+
+        {/* ===== Resumen mensual (totalizado) ===== */}
+        <div className="mt-10">
+          <div className="flex flex-wrap justify-between items-end gap-4 mb-4">
+            <div>
+              <h2 className="font-display text-2xl font-bold text-zinc-900">
+                Resumen mensual 📊
+              </h2>
+              <p className="text-zinc-500 text-sm mt-1">
+                Asistencia acumulada de cada estudiante en el mes
+              </p>
+            </div>
+
+            <input
+              type="month"
+              value={mes}
+              onChange={(e) => setMes(e.target.value)}
+              className="bg-white text-zinc-900 border border-zinc-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-yellow-400"
+            />
+          </div>
+
+          {/* Tarjetas resumen del mes */}
+          <div className="grid grid-cols-3 gap-4 mb-4 max-w-xl">
+            <div className="bg-white rounded-2xl p-4 border border-zinc-200 text-center">
+              <p className="font-display text-2xl font-bold text-zinc-900">
+                {sesionesDelMes}
+              </p>
+              <p className="text-sm text-zinc-500 capitalize">{nombreMes}</p>
+            </div>
+            <div className="bg-white rounded-2xl p-4 border border-zinc-200 text-center">
+              <p className="font-display text-2xl font-bold text-green-600">
+                {pctMes}%
+              </p>
+              <p className="text-sm text-zinc-500">Asistencia global</p>
+            </div>
+            <div className="bg-white rounded-2xl p-4 border border-zinc-200 text-center">
+              <p className="font-display text-2xl font-bold text-zinc-900">
+                {students.length}
+              </p>
+              <p className="text-sm text-zinc-500">Estudiantes</p>
+            </div>
+          </div>
+
+          {sesionesDelMes === 0 ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-10 text-center text-zinc-500">
+              No hay registros de asistencia en {nombreMes}.
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden">
+              <table className="w-full text-zinc-900">
+                <thead className="bg-zinc-100">
+                  <tr>
+                    <th className="text-left p-4 font-semibold text-zinc-700">Estudiante</th>
+                    <th className="text-left p-4 font-semibold text-zinc-700">Presentes</th>
+                    <th className="text-left p-4 font-semibold text-zinc-700">Ausentes</th>
+                    <th className="text-left p-4 font-semibold text-zinc-700 w-1/3">
+                      % Asistencia
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthlyStats.map(({ student, pres, aus, total, pct }) => (
+                    <tr
+                      key={student.id}
+                      className="border-t border-zinc-200 hover:bg-zinc-50 transition"
+                    >
+                      <td className="p-4 font-medium">{student.nombre}</td>
+                      <td className="p-4 text-green-700 font-medium">{pres}</td>
+                      <td className="p-4 text-red-600 font-medium">{aus}</td>
+                      <td className="p-4">
+                        {total === 0 ? (
+                          <span className="text-zinc-400 text-sm">Sin registros</span>
+                        ) : (
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 h-3 bg-zinc-200 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-300 ${barColor(pct)}`}
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                            <span className="text-sm font-semibold text-zinc-700 w-10 text-right">
+                              {pct}%
+                            </span>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
 
       </main>
 
