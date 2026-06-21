@@ -1,6 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+type Student = {
+  id: number;
+  nombre: string;
+  categoria: string;
+  edad: number;
+  estado: string;
+};
 
 type NewStudentModalProps = {
   isOpen: boolean;
@@ -11,17 +19,36 @@ type NewStudentModalProps = {
     categoria: string;
     estado: string;
   }) => void;
+  onUpdateStudent: (student: Student) => void;
+  editingStudent: Student | null;
 };
 
 export default function NewStudentModal({
   isOpen,
   onClose,
   onAddStudent,
+  onUpdateStudent,
+  editingStudent,
 }: NewStudentModalProps) {
 
   const [nombre, setNombre] = useState('');
   const [edad, setEdad] = useState('');
   const [categoria, setCategoria] = useState('Sub-10');
+
+  const isEditing = editingStudent !== null;
+
+  // Cargar / limpiar los campos cuando se abre el modal
+  useEffect(() => {
+    if (editingStudent) {
+      setNombre(editingStudent.nombre);
+      setEdad(String(editingStudent.edad));
+      setCategoria(editingStudent.categoria);
+    } else {
+      setNombre('');
+      setEdad('');
+      setCategoria('Sub-10');
+    }
+  }, [editingStudent, isOpen]);
 
   if (!isOpen) return null;
 
@@ -42,19 +69,25 @@ export default function NewStudentModal({
       return;
     }
 
-    onAddStudent({
-      nombre,
-      edad: edadNumero,
-      categoria,
-      estado: 'Activo',
-    });
+    if (editingStudent) {
+      // Modo edición: conservamos id y estado
+      onUpdateStudent({
+        ...editingStudent,
+        nombre,
+        edad: edadNumero,
+        categoria,
+      });
+    } else {
+      // Modo creación
+      onAddStudent({
+        nombre,
+        edad: edadNumero,
+        categoria,
+        estado: 'Activo',
+      });
+    }
 
-    // Limpiar formulario
-    setNombre('');
-    setEdad('');
-    setCategoria('Sub-10');
-
-    // Cerrar modal
+    // Cerrar modal (la limpieza la hace el useEffect)
     onClose();
   }
 
@@ -68,11 +101,13 @@ export default function NewStudentModal({
 
           <div>
             <h2 className="text-2xl font-bold text-zinc-900">
-              Nuevo estudiante ⚽
+              {isEditing ? 'Editar estudiante ✏️' : 'Nuevo estudiante ⚽'}
             </h2>
 
             <p className="text-zinc-500 mt-1">
-              Agrega un estudiante a la escuela
+              {isEditing
+                ? 'Actualiza los datos del estudiante'
+                : 'Agrega un estudiante a la escuela'}
             </p>
           </div>
 
@@ -195,7 +230,7 @@ export default function NewStudentModal({
               type="submit"
               className="px-5 py-3 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-zinc-900 font-semibold transition"
             >
-              Guardar estudiante
+              {isEditing ? 'Guardar cambios' : 'Guardar estudiante'}
             </button>
 
           </div>

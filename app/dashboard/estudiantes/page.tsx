@@ -92,6 +92,19 @@ export default function EstudiantesPage() {
     setStudents(filteredStudents);
   }
 
+  // actualizar un estudiante existente
+  function updateStudent(
+    updated: Student
+  ) {
+    setStudents((prev) =>
+      prev.map((student) =>
+        student.id === updated.id
+          ? updated
+          : student
+      )
+    );
+  }
+
   // abrir modal para editar
   function editStudent(
     student: Student
@@ -122,7 +135,7 @@ export default function EstudiantesPage() {
         <div className="flex justify-between items-center mb-8">
 
           <div>
-            <h1 className="text-3xl font-bold text-zinc-900">
+            <h1 className="font-display text-3xl font-bold text-zinc-900">
               Estudiantes 👥
             </h1>
 
@@ -208,6 +221,8 @@ export default function EstudiantesPage() {
             setEditingStudent(null);
           }}
           onAddStudent={addStudent}
+          onUpdateStudent={updateStudent}
+          editingStudent={editingStudent}
         />
 
       </main>
