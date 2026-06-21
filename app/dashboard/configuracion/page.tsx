@@ -52,7 +52,7 @@ export default function ConfiguracionPage() {
       <main className="flex-1 p-8">
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-zinc-900">Configuración ⚙️</h1>
+          <h1 className="font-display text-3xl font-bold text-zinc-900">Configuración ⚙️</h1>
           <p className="text-zinc-600 mt-1">
             Ajusta los datos generales de la escuela
           </p>

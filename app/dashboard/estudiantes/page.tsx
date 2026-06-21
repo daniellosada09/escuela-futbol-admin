@@ -135,7 +135,7 @@ export default function EstudiantesPage() {
         <div className="flex justify-between items-center mb-8">
 
           <div>
-            <h1 className="text-3xl font-bold text-zinc-900">
+            <h1 className="font-display text-3xl font-bold text-zinc-900">
               Estudiantes 👥
             </h1>
 

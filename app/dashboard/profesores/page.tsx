@@ -87,7 +87,7 @@ export default function ProfesoresPage() {
 
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-zinc-900">Profesores 👔</h1>
+            <h1 className="font-display text-3xl font-bold text-zinc-900">Profesores 👔</h1>
             <p className="text-zinc-600 mt-1">
               Gestiona el cuerpo técnico de la escuela
             </p>

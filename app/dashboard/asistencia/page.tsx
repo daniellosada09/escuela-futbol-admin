@@ -81,7 +81,7 @@ export default function AsistenciaPage() {
       <main className="flex-1 p-8">
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-zinc-900">Asistencia 📋</h1>
+          <h1 className="font-display text-3xl font-bold text-zinc-900">Asistencia 📋</h1>
           <p className="text-zinc-600 mt-1">
             Registra la asistencia de los estudiantes por día
           </p>

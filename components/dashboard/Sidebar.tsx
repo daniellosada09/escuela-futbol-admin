@@ -26,7 +26,7 @@ export default function Sidebar() {
   return (
     <aside className="w-72 bg-zinc-900 text-white p-6">
 
-      <h1 className="text-2xl font-bold mb-10 text-yellow-400">
+      <h1 className="font-display text-2xl font-bold mb-10 text-yellow-400">
         ⚽ Escuela
       </h1>
 
