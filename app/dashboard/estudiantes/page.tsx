@@ -92,6 +92,19 @@ export default function EstudiantesPage() {
     setStudents(filteredStudents);
   }
 
+  // actualizar un estudiante existente
+  function updateStudent(
+    updated: Student
+  ) {
+    setStudents((prev) =>
+      prev.map((student) =>
+        student.id === updated.id
+          ? updated
+          : student
+      )
+    );
+  }
+
   // abrir modal para editar
   function editStudent(
     student: Student
@@ -208,6 +221,8 @@ export default function EstudiantesPage() {
             setEditingStudent(null);
           }}
           onAddStudent={addStudent}
+          onUpdateStudent={updateStudent}
+          editingStudent={editingStudent}
         />
 
       </main>

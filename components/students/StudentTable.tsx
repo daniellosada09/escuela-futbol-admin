@@ -9,11 +9,13 @@ type Student = {
 type StudentTableProps = {
   students: Student[];
   onDeleteStudent: (id: number) => void;
+  onEditStudent: (student: Student) => void;
 };
 
 export default function StudentTable({
   students,
   onDeleteStudent,
+  onEditStudent,
 }: StudentTableProps) {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden">
@@ -82,21 +84,41 @@ export default function StudentTable({
 
               <td className="p-4">
 
-                <button
-                  onClick={() => onDeleteStudent(student.id)}
-                  className="
-                    bg-red-100
-                    text-red-600
-                    hover:bg-red-200
-                    px-4
-                    py-2
-                    rounded-xl
-                    font-medium
-                    transition
-                  "
-                >
-                  Eliminar
-                </button>
+                <div className="flex gap-2">
+
+                  <button
+                    onClick={() => onEditStudent(student)}
+                    className="
+                      bg-yellow-100
+                      text-yellow-700
+                      hover:bg-yellow-200
+                      px-4
+                      py-2
+                      rounded-xl
+                      font-medium
+                      transition
+                    "
+                  >
+                    Editar
+                  </button>
+
+                  <button
+                    onClick={() => onDeleteStudent(student.id)}
+                    className="
+                      bg-red-100
+                      text-red-600
+                      hover:bg-red-200
+                      px-4
+                      py-2
+                      rounded-xl
+                      font-medium
+                      transition
+                    "
+                  >
+                    Eliminar
+                  </button>
+
+                </div>
 
               </td>
             </tr>
